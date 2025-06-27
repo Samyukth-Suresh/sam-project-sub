@@ -30,15 +30,16 @@ Resources:
     Properties:
       ImageId: ami-0d03cb826412c6b0f            
       InstanceType: t2.micro
-      KeyName: mumbai-key              
+      KeyName: mumbai-key
       SecurityGroupIds:
         - !Ref MySecurityGroup       
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
+          ip=$(curl -s https://api.ipify.org)
           sudo dnf install -y git
-          mkdir -p /home/ec2-user/project
           git clone https://github.com/Samyukth-Suresh/sam-project.git /home/ec2-user/project
+          printf '{\n  "API_BASE": "http://%s:3000"\n}' "$ip" > /home/ec2-user/project/config.json
           sudo dnf install -y docker
           sudo systemctl enable docker
           sudo systemctl start docker
